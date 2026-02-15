@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans:
+        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+}
+
+@layer base {
+    :root,
+    [data-theme="haircare"] {
+        /* Base colors - Light Theme */
+        --b1: #fffaf7; /* bg-base-100 - Cream background */
+        --b2: #ffece2; /* bg-base-200 - Lighter cream */
+        --b3: #ffd7c2; /* bg-base-300 - Even lighter */
+        --bc: #1f2933; /* text-base-content - Dark text */
+
+        /* Primary – warm orange */
+        --p: #f97316;
+        --pc: #ffffff;
+
+        /* Secondary – pink accent */
+        --s: #ec4899;
+        --sc: #ffffff;
+
+        /* Accent – green for success actions */
+        --a: #22c55e;
+        --ac: #ffffff;
+
+        /* Neutral */
+        --n: #111827;
+        --nc: #f9fafb;
+
+        /* Status colors */
+        --in: #0ea5e9;
+        --inc: #f9fafb;
+        --su: #16a34a;
+        --suc: #f9fafb;
+        --wa: #facc15;
+        --wac: #1f2937;
+        --er: #ef4444;
+        --erc: #f9fafb;
+
+        /* Radius & component tweaks */
+        --rounded-box: 1.25rem;
+        --rounded-btn: 9999px;
+        --rounded-badge: 9999px;
+        --btn-text-case: capitalize;
+        --btn-focus-scale: 0.97;
+        --border-btn: 1px;
+        --tab-radius: 0.75rem;
+    }
+}

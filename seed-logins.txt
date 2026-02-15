@@ -1,0 +1,11 @@
+# Seeded account credentials
+
+# Known accounts created by DatabaseSeeder.php:
+admin@example.com,password,role=admin
+owner@example.com,password,role=salon_owner
+client@example.com,password,role=client
+
+# Note: When you run the seeder (`php artisan db:seed`) the script generates many extra
+# owner and client accounts and writes a larger list to `storage/app/logins.txt`.
+# Use those credentials (email/password) to sign in. All generated accounts use the
+# password: `password` unless you change the seeder.
