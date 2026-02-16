@@ -138,34 +138,54 @@
                                                     </form>
                                                 @endif
  
-                                                @if ($appointment->status === 'completed' && !$appointment->serviceReview)
-                                                    <form method="POST"
-                                                        action="{{ route('appointments.reviews.store', $appointment) }}"
-                                                        class="space-y-1">
-                                                        @csrf
-                                                        <input type="hidden" name="type" value="service">
-                                                        <select name="rating"
-                                                            class="block w-full rounded-md border-base-200 bg-base-100 text-xs text-base-content"
-                                                            required>
-                                                            <option value="">{{ __('Oceni salon') }}</option>
-                                                            @for ($i = 5; $i >= 1; $i--)
-                                                                <option value="{{ $i }}">{{ $i }}</option>
-                                                            @endfor
-                                                        </select>
-                                                        <textarea name="comment" rows="2"
-                                                            class="block w-full rounded-md border-base-200 bg-base-100 text-xs text-base-content"
-                                                            placeholder="{{ __('Komentar za salon (opciono)') }}"></textarea>
-                                                        <x-input-error :messages="$errors->get('rating')" class="mt-1" />
-                                                        <x-primary-button class="w-full justify-center text-xs">
-                                                            {{ __('Pošalji recenziju') }}
-                                                        </x-primary-button>
-                                                    </form>
-                                                @elseif ($appointment->serviceReview)
-                                                    <div class="text-xs text-base-content/70 flex items-center justify-end gap-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        {{ __('Ocenili ste salon') }} ({{ $appointment->serviceReview->rating }})
+                                                @if ($appointment->status === 'completed' && !$appointment->reviews()->where('type', 'service')->exists())
+                                                    <div class="mt-4 p-4 bg-base-200/50 rounded-xl border border-base-200">
+                                                        <h4 class="text-xs font-bold uppercase tracking-wider mb-4 text-left">{{ __('Vaša recenzija') }}</h4>
+                                                        <form method="POST" action="{{ route('appointments.reviews.store', $appointment) }}" class="space-y-4">
+                                                            @csrf
+                                                            <input type="hidden" name="type" value="service">
+                                                            
+                                                            <div class="flex flex-col gap-1 text-left">
+                                                                <label class="text-[10px] text-base-content/60 uppercase font-black">{{ __('Oceni salon') }}</label>
+                                                                <div class="rating rating-sm">
+                                                                    @for($i=1; $i<=5; $i++)
+                                                                        <input type="radio" name="salon_rating" value="{{ $i }}" class="mask mask-star-2 bg-orange-400" @checked($i == 5) />
+                                                                    @endfor
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex flex-col gap-1 text-left">
+                                                                <label class="text-[10px] text-base-content/60 uppercase font-black">{{ __('Oceni uslugu') }} ({{ $appointment->service->name }})</label>
+                                                                <div class="rating rating-sm">
+                                                                    @for($i=1; $i<=5; $i++)
+                                                                        <input type="radio" name="service_rating" value="{{ $i }}" class="mask mask-star-2 bg-orange-400" @checked($i == 5) />
+                                                                    @endfor
+                                                                </div>
+                                                            </div>
+
+                                                            <textarea name="comment" rows="2"
+                                                                class="block w-full rounded-md border-base-200 bg-base-100 text-xs text-base-content focus:border-primary focus:ring-primary"
+                                                                placeholder="{{ __('Komentar (opciono)') }}"></textarea>
+                                                            
+                                                            <x-primary-button class="w-full justify-center py-2 text-xs">
+                                                                {{ __('Pošalji recenziju') }}
+                                                            </x-primary-button>
+                                                        </form>
+                                                    </div>
+                                                @elseif ($appointment->reviews()->where('type', 'service')->first())
+                                                    @php $rev = $appointment->reviews()->where('type', 'service')->first(); @endphp
+                                                    <div class="text-xs text-base-content/70 flex flex-col items-end gap-1 p-2 bg-success/5 rounded-lg border border-success/10">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="text-[9px] uppercase opacity-50">{{ __('Salon') }}:</span>
+                                                            <span class="font-bold text-success">{{ $rev->salon_rating }} ★</span>
+                                                        </div>
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="text-[9px] uppercase opacity-50">{{ __('Usluga') }}:</span>
+                                                            <span class="font-bold text-success">{{ $rev->service_rating }} ★</span>
+                                                        </div>
+                                                        @if($rev->comment)
+                                                            <div class="text-[10px] italic mt-1 text-base-content/60 max-w-[150px] truncate">"{{ $rev->comment }}"</div>
+                                                        @endif
                                                     </div>
                                                 @endif
                                             </td>

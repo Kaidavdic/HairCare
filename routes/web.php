@@ -102,6 +102,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/users/{user}/activate', [\App\Http\Controllers\Admin\UserController::class, 'activate'])->name('users.activate');
             Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
 
+            // Review Moderation
+            Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'destroy']);
+
             // Settings (Contact)
             Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'edit'])->name('settings.edit');
             Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
@@ -125,6 +128,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+    Route::get('/profile/{user}', [ProfileController::class, 'show'])
+        ->name('profile.show');
 
     // Messages
     Route::get('/messages', [App\Http\Controllers\MessageController::class, 'index'])

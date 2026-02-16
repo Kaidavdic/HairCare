@@ -30,7 +30,7 @@ class PasswordController extends Controller
         // Check against history
         foreach ($history as $oldHash) {
             if (Hash::check($validated['password'], $oldHash)) {
-                return back()->withErrors(['password' => "Nova lozinka ne sme biti ista kao neka od poslednje {$historyLimit} korišćene lozinke."])
+                return back()->withErrors(['password' => __('validation.password_history', ['count' => $historyLimit])], 'updatePassword')
                     ->withInput();
             }
         }

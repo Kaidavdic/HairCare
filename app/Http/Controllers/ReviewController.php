@@ -42,7 +42,9 @@ class ReviewController extends Controller
         }
 
         $data = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'service_rating' => ['required_if:type,service', 'nullable', 'integer', 'min:1', 'max:5'],
+            'salon_rating' => ['required_if:type,service', 'nullable', 'integer', 'min:1', 'max:5'],
+            'rating' => ['required_if:type,user', 'nullable', 'integer', 'min:1', 'max:5'], // Keep for user rating
             'comment' => ['nullable', 'string', 'max:2000'],
             'type' => ['in:service,user'],
         ]);
@@ -51,8 +53,8 @@ class ReviewController extends Controller
             // Owner rating Client
             $review = $appointment->reviews()->create([
                 'salon_id' => $appointment->salon_id,
-                'client_id' => $appointment->client_id, // Author is owner, but we link to appointment
-                'reviewed_user_id' => $appointment->client_id, // User being reviewed
+                'client_id' => $appointment->client_id,
+                'reviewed_user_id' => $appointment->client_id,
                 'rating' => $data['rating'],
                 'comment' => $data['comment'] ?? null,
                 'type' => 'user',
@@ -72,29 +74,44 @@ class ReviewController extends Controller
                 $client->save();
             }
         } else {
-             // Client rating Salon (and optionally Service)
+             // Client rating Salon AND Service
             $review = $appointment->reviews()->create([
                 'salon_id' => $appointment->salon_id,
+                'service_id' => $appointment->service_id,
                 'client_id' => $user->id,
-                'rating' => $data['rating'],
+                'service_rating' => $data['service_rating'],
+                'salon_rating' => $data['salon_rating'],
+                'rating' => $data['salon_rating'], // Legacy fallback
                 'comment' => $data['comment'] ?? null,
                 'type' => 'service',
             ]);
 
-            // Update salon statistics
+            // Update salon statistics (Based on salon_rating)
             $salon = $appointment->salon;
             if ($salon) {
                 $currentCount = $salon->reviews_count;
                 $currentAverage = $salon->average_rating;
 
                 $newCount = $currentCount + 1;
-                $newAverage = $newCount > 0
-                    ? (($currentAverage * $currentCount) + $review->rating) / $newCount
-                    : $review->rating;
+                $newAverage = (($currentAverage * $currentCount) + $review->salon_rating) / $newCount;
 
                 $salon->reviews_count = $newCount;
                 $salon->average_rating = $newAverage;
                 $salon->save();
+            }
+
+            // Update service statistics (Based on service_rating)
+            $service = $appointment->service;
+            if ($service) {
+                $currentCount = (int) $service->reviews_count;
+                $currentAverage = (float) $service->average_rating;
+
+                $newCount = $currentCount + 1;
+                $newAverage = (($currentAverage * $currentCount) + $review->service_rating) / $newCount;
+
+                $service->reviews_count = $newCount;
+                $service->average_rating = $newAverage;
+                $service->save();
             }
         }
 

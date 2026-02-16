@@ -19,6 +19,15 @@
                             {{ session('error') }}
                         </div>
                     @endif
+                    @if ($errors->any())
+                        <div class="alert alert-error mb-4">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     <form method="GET" action="{{ route('admin.users.index') }}" class="mb-4">
                         <div class="flex gap-2">
@@ -34,6 +43,7 @@
                                     <th>{{ __('Ime') }}</th>
                                     <th>{{ __('Email') }}</th>
                                     <th>{{ __('Uloga') }}</th>
+                                    <th>{{ __('Rejting') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Akcije') }}</th>
                                 </tr>
@@ -41,9 +51,38 @@
                             <tbody>
                                 @foreach ($users as $user)
                                     <tr>
-                                        <td class="font-bold">{{ $user->name }}</td>
+                                        <td class="font-bold">
+                                            <a href="{{ route('profile.show', $user) }}" class="hover:text-primary hover:underline">
+                                                {{ $user->name }}
+                                            </a>
+                                        </td>
                                         <td>{{ $user->email }}</td>
                                         <td>{{ $user->role }}</td>
+                                        <td>
+                                            @if($user->isSalonOwner() && $user->salon)
+                                                @if($user->salon->reviews_count > 0)
+                                                    <div class="flex flex-col">
+                                                        <div class="flex items-center gap-1">
+                                                            <span class="font-bold text-primary">{{ number_format($user->salon->average_rating, 1) }} ★</span>
+                                                            <span class="text-[10px] opacity-40">({{ $user->salon->reviews_count }})</span>
+                                                        </div>
+                                                        <span class="text-[9px] uppercase opacity-40 leading-none mt-1">{{ __('Salon') }}</span>
+                                                    </div>
+                                                @else
+                                                    <span class="text-xs opacity-30 italic">{{ __('Nema ocena salona') }}</span>
+                                                @endif
+                                            @elseif($user->reviews_count > 0)
+                                                <div class="flex flex-col">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="font-bold text-warning">{{ number_format($user->average_rating, 1) }} ★</span>
+                                                        <span class="text-[10px] opacity-40">({{ $user->reviews_count }})</span>
+                                                    </div>
+                                                    <span class="text-[9px] uppercase opacity-40 leading-none mt-1">{{ __('Klijent') }}</span>
+                                                </div>
+                                            @else
+                                                <span class="text-xs opacity-30 italic">{{ __('Nema ocena') }}</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             @if ($user->status === 'active')
                                                 <div class="badge badge-success">{{ __('Aktivan') }}</div>
@@ -55,6 +94,7 @@
                                         </td>
                                         <td class="flex gap-2">
                                             @if($user->status !== 'banned')
+                                                <a href="{{ route('messages.show', $user->id) }}" class="btn btn-ghost btn-xs text-primary">{{ __('Poruka') }}</a>
                                                 <button class="btn btn-warning btn-xs" onclick="document.getElementById('warn-modal-{{ $user->id }}').showModal()">{{ __('Opomena') }}</button>
                                                 <form action="{{ route('admin.users.ban', $user) }}" method="POST" onsubmit="return confirm('Da li ste sigurni da želite da banujete korisnika?');">
                                                     @csrf
@@ -81,7 +121,7 @@
                                                         @csrf
                                                         <div class="form-control w-full mt-4">
                                                             <label class="label"><span class="label-text">Poruka upozorenja</span></label>
-                                                            <textarea name="message" class="textarea textarea-bordered h-24" placeholder="Vaš nalog krši pravila... (ova poruka će biti vidljiva korisniku u njegovim obaveštenjima)"></textarea>
+                                                            <textarea name="message" class="textarea textarea-bordered h-24" placeholder="Vaš nalog krši pravila... (ova poruka će biti vidljiva korisniku u njegovim obaveštenjima)" required minlength="3"></textarea>
                                                         </div>
                                                         <div class="modal-action">
                                                             <button type="submit" class="btn btn-error">Pošalji</button>

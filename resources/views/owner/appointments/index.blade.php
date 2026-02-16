@@ -18,10 +18,51 @@
                             {{ session('status') }}
                         </div>
                     @endif
+                    <!-- Filter & Sort Bar -->
+                    <div class="mb-6 bg-base-100 p-4 rounded-lg shadow-sm border border-base-200">
+                        <form method="GET" action="{{ route('owner.appointments.index') }}" class="flex flex-wrap items-end gap-4">
+                            <div class="form-control w-full max-w-[200px]">
+                                <label class="label pt-0"><span class="label-text font-semibold">{{ __('Status termina') }}</span></label>
+                                <select name="tab" class="select select-bordered select-sm w-full">
+                                    <option value="all" @selected($currentTab === 'all')>{{ __('Svi termini') }}</option>
+                                    <option value="active" @selected($currentTab === 'active')>{{ __('Aktivni termini') }}</option>
+                                    <option value="completed" @selected($currentTab === 'completed')>{{ __('Završeni / Otkazani') }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-control w-full max-w-xs">
+                                <label class="label pt-0"><span class="label-text font-semibold">{{ __('Usluga') }}</span></label>
+                                <select name="service_id" class="select select-bordered select-sm w-full">
+                                    <option value="">{{ __('Sve usluge') }}</option>
+                                    @foreach($services as $service)
+                                        <option value="{{ $service->id }}" @selected(request('service_id') == $service->id)>
+                                            {{ $service->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-control w-full max-w-xs">
+                                <label class="label pt-0"><span class="label-text font-semibold">{{ __('Poredaj po oceni klijenta') }}</span></label>
+                                <select name="sort_rating" class="select select-bordered select-sm w-full">
+                                    <option value="">{{ __('Uobičajeno (vreme)') }}</option>
+                                    <option value="desc" @selected(request('sort_rating') == 'desc')>{{ __('Najviša prvo') }}</option>
+                                    <option value="asc" @selected(request('sort_rating') == 'asc')>{{ __('Najniža prvo') }}</option>
+                                </select>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary btn-sm px-6">{{ __('Primeni') }}</button>
+                                @if(request()->anyFilled(['service_id', 'sort_rating']) || request('tab') === 'completed')
+                                    <a href="{{ route('owner.appointments.index') }}" class="btn btn-ghost btn-sm">{{ __('Resetuj') }}</a>
+                                @endif
+                            </div>
+                        </form>
+                    </div>
 
                     @if ($appointments->isEmpty())
                         <p class="text-sm text-base-content/80">
-                            {{ __('Trenutno nema zakazanih termina.') }}
+                            {{ __('Trenutno nema termina u ovoj kategoriji.') }}
                         </p>
                     @else
                         <div class="overflow-x-auto">
@@ -50,7 +91,24 @@
                                         <tr class="border-b border-base-200">
                                             <td class="py-3 px-4">
                                                 <div class="font-medium flex items-center gap-2">
-                                                    {{ $appointment->client->name ?? __('Klijent') }}
+                                                    @if($appointment->client)
+                                                        <a href="{{ route('profile.show', $appointment->client) }}" class="link link-hover hover:text-primary">
+                                                            {{ $appointment->client->name }}
+                                                        </a>
+                                                    @else
+                                                        {{ __('Klijent') }}
+                                                    @endif
+                                                    
+                                                    @if($appointment->client_id)
+                                                        <a href="{{ route('messages.show', $appointment->client_id) }}" 
+                                                           class="text-primary hover:text-primary-focus transition-colors"
+                                                           title="{{ __('Pošalji poruku') }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                                            </svg>
+                                                        </a>
+                                                    @endif
+
                                                     @if(isset($appointment->client->average_rating) && $appointment->client->reviews_count > 0)
                                                         <span class="inline-flex items-center text-xs font-semibold text-orange-500">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 fill-current mb-0.5" viewBox="0 0 20 20">

@@ -15,17 +15,25 @@
     @include('layouts.navigation')
 
     <!-- Hero -->
-    <div class="hero min-h-[50vh] bg-base-200">
-        <div class="hero-content text-center">
-            <div class="max-w-md">
-                <h1 class="text-5xl font-bold">Pronađi savršen salon</h1>
-                <p class="py-6">
-                    Rezerviši termin za frizuru, šminku ili masažu u najboljim salonima u gradu. Brzo, lako i pouzdano.
+    @php
+        $heroBg = isset($settings['hero_bg_image']) ? asset('storage/' . $settings['hero_bg_image']) : null;
+        $heroTitle = $settings['hero_title'] ?? 'Ponađi savršen salon';
+        $heroContent = $settings['hero_content'] ?? 'Rezerviši termin za frizuru, šminku ili masažu u najboljim salonima u gradu. Brzo, lako i pouzdano.';
+    @endphp
+    
+    <div class="hero min-h-[50vh] transition-all duration-500" 
+         style="{{ $heroBg ? "background-image: url('{$heroBg}'); background-size: cover; background-position: center;" : "background-color: var(--p);" }}">
+        <div class="hero-overlay {{ $heroBg ? 'bg-black/40' : 'hidden' }}"></div>
+        <div class="hero-content text-center {{ $heroBg ? 'text-white' : '' }}">
+            <div class="max-w-xl">
+                <h1 class="text-5xl font-bold drop-shadow-lg">{{ $heroTitle }}</h1>
+                <p class="py-6 text-lg font-medium drop-shadow-md">
+                    {{ $heroContent }}
                 </p>
                 <div class="flex justify-center gap-4">
-                    <a href="{{ route('salons.index') }}" class="btn btn-primary">Pretraži Salone</a>
+                    <a href="{{ route('salons.index') }}" class="btn btn-primary {{ $heroBg ? 'border-white' : '' }}">Pretraži Salone</a>
                     @guest
-                        <a href="{{ route('register') }}" class="btn btn-outline">Postani Partner</a>
+                        <a href="{{ route('register') }}" class="btn btn-outline {{ $heroBg ? 'text-white border-white hover:bg-white hover:text-black' : '' }}">Postani Partner</a>
                     @endguest
                 </div>
             </div>
@@ -354,11 +362,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer footer-center p-4 bg-base-300 text-base-content">
-        <aside>
-            <p>Copyright © {{ date('Y') }} - Sva prava zadržana, HairCare App</p>
-        </aside>
-    </footer>
+    <x-footer />
 
 </body>
 </html>

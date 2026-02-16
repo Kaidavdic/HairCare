@@ -59,11 +59,29 @@ class DashboardController extends Controller
             $stats['averageRating'] = $salon->average_rating;
             $stats['totalReviews'] = $salon->reviews_count;
 
-            // lists
+            // Rating Distribution (Salon)
+            $stats['ratingDistribution'] = $salon->reviews()
+                ->where('type', 'service')
+                ->selectRaw('salon_rating as star, count(*) as count')
+                ->groupBy('salon_rating')
+                ->pluck('count', 'star')
+                ->toArray();
+            
+            // Monthly Rating Trends (Last 6 months)
+            $stats['monthlyTrends'] = $salon->reviews()
+                ->where('type', 'service')
+                ->where('created_at', '>=', Carbon::now()->subMonths(6))
+                ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, AVG(salon_rating) as average')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->pluck('average', 'month')
+                ->toArray();
+
+            // Lists
             $stats['recentAppointments'] = $salon->appointments()
                 ->with(['client', 'service'])
                 ->where('scheduled_at', '>=', Carbon::now())
-                ->where('status', 'scheduled')
+                ->whereIn('status', ['pending', 'confirmed'])
                 ->orderBy('scheduled_at')
                 ->take(5)
                 ->get();
@@ -71,6 +89,13 @@ class DashboardController extends Controller
             $stats['popularServices'] = $salon->services()
                 ->withCount('appointments')
                 ->orderByDesc('appointments_count')
+                ->take(5)
+                ->get();
+            
+            // Service Performance (Highest rated)
+            $stats['servicePerformance'] = $salon->services()
+                ->where('reviews_count', '>', 0)
+                ->orderByDesc('average_rating')
                 ->take(5)
                 ->get();
         }

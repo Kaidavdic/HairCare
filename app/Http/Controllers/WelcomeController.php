@@ -8,7 +8,11 @@ class WelcomeController extends Controller
 {
     public function index(Request $request)
     {
-        $news = \App\Models\Notification::where('is_visible', true)->latest()->take(3)->get();
+        $news = \App\Models\Notification::where('is_visible', true)
+            ->whereNull('user_id')
+            ->latest()
+            ->take(3)
+            ->get();
         $popularServices = \App\Models\Service::with('salon')->withCount('appointments')
             ->orderByDesc('appointments_count')
             ->take(4)
@@ -74,12 +78,15 @@ class WelcomeController extends Controller
 
         $salons = $query->paginate(9)->withQueryString();
 
+        $settings = json_decode(\Illuminate\Support\Facades\Storage::get('settings.json') ?? '{}', true);
+
         return view('welcome', [
             'news' => $news,
             'popularServices' => $popularServices,
             'popularSalons' => $popularSalons,
             'promotions' => $promotions,
             'salons' => $salons,
+            'settings' => $settings,
             'filters' => [
                 'type' => $request->input('type'),
                 'q' => $request->input('q'),

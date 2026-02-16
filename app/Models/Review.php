@@ -12,12 +12,20 @@ class Review extends Model
     protected $fillable = [
         'appointment_id',
         'salon_id',
+        'service_id',
         'client_id',
         'type',
         'reviewed_user_id',
-        'rating',
+        'rating', // Legacy, keep for now
+        'service_rating',
+        'salon_rating',
         'comment',
     ];
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
 
     public function appointment()
     {

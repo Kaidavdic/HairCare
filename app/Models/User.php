@@ -31,6 +31,7 @@ class User extends Authenticatable
         'password',
         'average_rating',
         'reviews_count',
+        'profile_picture',
     ];
 
     /**

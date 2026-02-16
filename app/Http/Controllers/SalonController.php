@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Notification;
 use App\Models\Salon;
 use App\Models\Service;
 use Illuminate\Http\RedirectResponse;
@@ -31,11 +32,17 @@ class SalonController extends Controller
         $salon->load([
             'images',
             'services' => fn ($q) => $q->where('is_active', true)->orderBy('name'),
-            'reviews.client',
         ]);
+
+        $reviews = $salon->reviews()
+            ->with(['client', 'service'])
+            ->where('type', 'service')
+            ->latest()
+            ->paginate(5);
 
         return view('salons.show', [
             'salon' => $salon,
+            'reviews' => $reviews,
         ]);
     }
 
@@ -175,6 +182,14 @@ class SalonController extends Controller
             'ends_at' => $end,
             'status' => 'pending',
             'note' => $request->input('note'),
+        ]);
+
+        Notification::create([
+            'user_id' => $salon->owner_id,
+            'type' => 'info',
+            'title' => 'Novi zahtev za termin',
+            'content' => "Klijent {$user->name} je zatražio termin za uslugu {$service->name}.",
+            'is_visible' => true,
         ]);
 
         return redirect()

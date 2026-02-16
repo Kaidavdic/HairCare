@@ -18,6 +18,8 @@ class Service extends Model
         'is_promoted',
         'discount_price',
         'is_active',
+        'average_rating',
+        'reviews_count',
     ];
 
     public function salon()

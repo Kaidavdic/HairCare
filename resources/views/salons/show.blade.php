@@ -113,6 +113,14 @@
                                                     @if($service->is_promoted && $service->discount_price)
                                                         <span class="badge badge-accent badge-sm uppercase font-bold tracking-tighter">{{ __('Promocija') }}</span>
                                                     @endif
+                                                    
+                                                    @if($service->reviews_count > 0)
+                                                        <div class="flex items-center gap-1 bg-warning/10 px-2 py-0.5 rounded-lg border border-warning/20">
+                                                            <span class="text-[10px] font-bold text-warning-content">{{ number_format($service->average_rating, 1) }}</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-warning fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                                            <span class="text-[9px] opacity-40">({{ $service->reviews_count }})</span>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                                 <div class="flex items-center gap-3 mt-1">
                                                     <span class="text-xs text-base-content/60 flex items-center gap-1">
@@ -302,33 +310,60 @@
                                 {{ __('Recenzije') }}
                             </h3>
 
-                            @if ($salon->reviews->isEmpty())
+                            @if ($reviews->isEmpty())
                                 <p class="mt-3 text-sm text-base-content/80">
                                     {{ __('Ovaj salon još uvek nema recenzije.') }}
                                 </p>
                             @else
                                 <ul class="mt-4 space-y-4">
-                                    @foreach ($salon->reviews as $review)
-                                        <li class="border border-base-200 rounded-lg p-4">
-                                            <div class="flex items-center justify-between">
-                                                <p class="text-sm font-medium text-base-content">
-                                                    {{ $review->client->name ?? __('Klijent') }}
-                                                </p>
-                                                <p class="text-sm text-base-content">
-                                                    {{ $review->rating }} ★
-                                                </p>
+                                    @foreach ($reviews as $review)
+                                        <li class="border border-base-200 rounded-lg p-4 bg-base-200/20">
+                                            <div class="flex items-start justify-between">
+                                                <div>
+                                                    <p class="text-sm font-bold text-base-content">
+                                                        @if($review->client)
+                                                            <a href="{{ route('profile.show', $review->client) }}" class="link link-hover hover:text-primary">
+                                                                {{ $review->client->name }}
+                                                            </a>
+                                                        @else
+                                                            {{ __('Klijent') }}
+                                                        @endif
+                                                    </p>
+                                                    <div class="flex items-center gap-2 mt-0.5">
+                                                        <span class="text-[10px] text-base-content/50 uppercase">{{ __('Usluga') }}:</span>
+                                                        <span class="text-xs font-medium text-primary">
+                                                            {{ $review->service?->name ?? ($review->appointment?->service?->name ?? __('Obrisana usluga')) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-col items-end gap-1">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="flex flex-col items-end">
+                                                            <span class="text-[9px] uppercase opacity-40 leading-none">{{ __('Salon') }}</span>
+                                                            <span class="text-sm font-bold text-warning">{{ $review->salon_rating ?? $review->rating }} ★</span>
+                                                        </div>
+                                                        <div class="flex flex-col items-end border-l border-base-300 pl-3">
+                                                            <span class="text-[9px] uppercase opacity-40 leading-none">{{ __('Usluga') }}</span>
+                                                            <span class="text-sm font-bold text-success">{{ $review->service_rating ?? $review->rating }} ★</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             @if ($review->comment)
-                                                <p class="mt-2 text-sm text-base-content/80">
-                                                    {{ $review->comment }}
-                                                </p>
+                                                <div class="mt-3 p-3 bg-base-100 rounded-lg border border-base-200 text-sm italic text-base-content/80">
+                                                    "{{ $review->comment }}"
+                                                </div>
                                             @endif
-                                            <p class="mt-1 text-xs text-base-content/70">
-                                                {{ $review->created_at->format('d.m.Y H:i') }}
+                                            <p class="mt-2 text-[10px] text-base-content/40 uppercase tracking-widest text-right">
+                                                {{ $review->created_at->diffForHumans() }}
                                             </p>
                                         </li>
                                     @endforeach
                                 </ul>
+
+                                <div class="mt-6">
+                                    {{ $reviews->links() }}
+                                </div>
                             @endif
                         </div>
                     </div>

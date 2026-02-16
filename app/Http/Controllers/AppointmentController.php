@@ -34,14 +34,57 @@ class AppointmentController extends Controller
 
         abort_if(! $salon, 404);
 
-        $appointments = Appointment::forSalon($salon->id)
-            ->with(['client', 'service'])
-            ->orderBy('scheduled_at')
-            ->paginate(15);
+        $tab = $request->input('tab', 'all');
+        $serviceId = $request->input('service_id');
+        $sortRating = $request->input('sort_rating');
+
+        $services = $salon->services()->orderBy('name')->get();
+
+        $query = Appointment::forSalon($salon->id)
+            ->with(['client', 'service']);
+
+        // Filter by status (tab)
+        if ($tab === 'completed') {
+            $query->whereIn('appointments.status', ['completed', 'rejected', 'cancelled']);
+        } elseif ($tab === 'active') {
+            $query->whereIn('appointments.status', ['pending', 'confirmed']);
+        }
+        // 'all' tab applies no status filter
+
+        // Filter by service
+        if ($serviceId) {
+            $query->where('appointments.service_id', $serviceId);
+        }
+
+        // Handle Sorting
+        if ($sortRating === 'desc') {
+            $query->join('users', 'appointments.client_id', '=', 'users.id')
+                ->select('appointments.*')
+                ->orderByDesc('users.average_rating');
+        } elseif ($sortRating === 'asc') {
+            $query->join('users', 'appointments.client_id', '=', 'users.id')
+                ->select('appointments.*')
+                ->orderBy('users.average_rating');
+        } else {
+            // Default Sorting per tab if no user-defined sort is active
+            if ($tab === 'completed') {
+                $query->orderByDesc('appointments.scheduled_at');
+            } else {
+                $query->orderBy('appointments.scheduled_at');
+            }
+        }
+
+        $appointments = $query->paginate(15)->withQueryString();
 
         return view('owner.appointments.index', [
             'salon' => $salon,
             'appointments' => $appointments,
+            'services' => $services,
+            'currentTab' => $tab,
+            'filters' => [
+                'service_id' => $serviceId,
+                'sort_rating' => $sortRating,
+            ],
         ]);
     }
 

@@ -10,14 +10,26 @@
             <div class="bg-base-100 shadow-xl sm:rounded-lg h-[calc(100vh-250px)] max-h-[700px] min-h-[500px] flex flex-col border border-base-200">
                 <!-- Chat Header -->
                 <div class="p-4 border-b border-base-200 flex items-center gap-3 bg-base-100/50">
-                     <div class="avatar placeholder">
-                        <div class="bg-secondary text-secondary-content rounded-full w-10">
-                            <span class="text-sm font-bold">{{ substr($otherUser->name, 0, 1) }}</span>
-                        </div>
+                     <div class="avatar @if(!$otherUser->profile_picture) placeholder @endif">
+                        @if($otherUser->profile_picture)
+                            <div class="w-12 h-12 rounded-full ring-2 ring-base-300">
+                                <img src="{{ asset('storage/' . $otherUser->profile_picture) }}" 
+                                     alt="{{ $otherUser->name }}" 
+                                     class="w-full h-full object-cover rounded-full" />
+                            </div>
+                        @else
+                            <div class="bg-secondary text-secondary-content rounded-full w-12 h-12 flex items-center justify-center ring-2 ring-base-300">
+                                <span class="text-base font-bold">{{ substr($otherUser->name, 0, 1) }}</span>
+                            </div>
+                        @endif
                     </div>
                     <div>
-                        <h3 class="font-bold text-sm">{{ $otherUser->name }}</h3>
-                        <p class="text-[10px] opacity-60 uppercase">{{ $otherUser->role === 'salon_owner' ? __('Vlasnik salona') : __('Klijent') }}</p>
+                        <h3 class="font-bold text-base">
+                            <a href="{{ route('profile.show', $otherUser) }}" class="hover:underline">
+                                {{ $otherUser->name }}
+                            </a>
+                        </h3>
+                        <p class="text-xs text-base-content/60">{{ $otherUser->role === 'salon_owner' ? __('Vlasnik salona') : __('Klijent') }}</p>
                     </div>
                 </div>
 

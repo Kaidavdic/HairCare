@@ -61,6 +61,10 @@
                             class="btn btn-ghost btn-sm {{ request()->routeIs('admin.notifications.*') ? 'btn-active' : '' }}">
                             {{ __('Globalna obaveštenja') }}
                         </a>
+                        <a href="{{ route('admin.reviews.index') }}"
+                            class="btn btn-ghost btn-sm {{ request()->routeIs('admin.reviews.*') ? 'btn-active' : '' }}">
+                            {{ __('Recenzije') }}
+                        </a>
                         <a href="{{ route('admin.settings.edit') }}"
                             class="btn btn-ghost btn-sm {{ request()->routeIs('admin.settings.*') ? 'btn-active' : '' }}">
                             {{ __('Postavke') }}
@@ -178,6 +182,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.notifications.index')" :active="request()->routeIs('admin.notifications.*')">
                     {{ __('Obaveštenja (Admin)') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')">
+                    {{ __('Recenzije') }}
                 </x-responsive-nav-link>
             @endif
         </div>

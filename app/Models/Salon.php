@@ -22,6 +22,23 @@ class Salon extends Model
         'closed_days',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up salon images from storage when salon is deleted
+        static::deleting(function ($salon) {
+            // Delete all image files from storage
+            foreach ($salon->images as $image) {
+                if ($image->image_url) {
+                    $path = str_replace('/storage/', '', $image->image_url);
+                    \Storage::disk('public')->delete($path);
+                }
+            }
+        });
+    }
+
+
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');

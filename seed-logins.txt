@@ -1,11 +1,16 @@
-# Seeded account credentials
+DEMO PODACI - LOGINOVI
+Generisano: 2026-02-16 15:24:15
+=================================
 
-# Known accounts created by DatabaseSeeder.php:
-admin@example.com,password,role=admin
-owner@example.com,password,role=salon_owner
-client@example.com,password,role=client
+ADMIN: admin@haircare.com / password
+VLASNIK: owner1@haircare.com / password
+VLASNIK: owner2@haircare.com / password
+VLASNIK: owner3@haircare.com / password
+KLIJENT: client1@haircare.com / password
+KLIJENT: client2@haircare.com / password
+KLIJENT: client3@haircare.com / password
+KLIJENT: client4@haircare.com / password
+KLIJENT: client5@haircare.com / password
 
-# Note: When you run the seeder (`php artisan db:seed`) the script generates many extra
-# owner and client accounts and writes a larger list to `storage/app/logins.txt`.
-# Use those credentials (email/password) to sign in. All generated accounts use the
-# password: `password` unless you change the seeder.
+NAPOMENA: Sifre za sve nologe su 'password'.
+Slike salona su placeholderi. Da ih promenite, editujte 'DemoDataSeeder.php' i promenite URL-ove.

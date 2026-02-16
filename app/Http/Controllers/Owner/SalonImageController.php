@@ -16,7 +16,7 @@ class SalonImageController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
             'alt_text' => 'nullable|string|max:255',
         ]);
 
@@ -24,6 +24,11 @@ class SalonImageController extends Controller
 
         if (!$salon) {
             return redirect()->route('owner.salon.edit')->with('error', 'Prvo kreirajte salon.');
+        }
+
+        // Check if salon is approved
+        if ($salon->status !== 'approved') {
+            return redirect()->route('owner.salon.edit')->with('error', 'Ne možete dodavati slike dok salon nije odobren.');
         }
 
         $file = $request->file('image');

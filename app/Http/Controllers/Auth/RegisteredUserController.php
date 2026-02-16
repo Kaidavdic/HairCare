@@ -35,10 +35,10 @@ class RegisteredUserController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'role' => ['required', 'in:salon_owner,client'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'interests' => ['nullable', 'string', 'max:500'],
+            'interests' => ['nullable', 'array'],
         ]);
 
-        $status = $request->role === User::ROLE_SALON_OWNER ? 'pending' : 'active';
+        $status = 'active'; // All users are active immediately
         $hashedPassword = Hash::make($request->password);
         
         // Generate automatic username
@@ -48,11 +48,7 @@ class RegisteredUserController extends Controller
             $username = $baseUsername . rand(100, 999);
         }
 
-        $interests = $request->interests;
-        if (is_string($interests)) {
-            $interests = array_map('trim', explode(',', $interests));
-        }
-        $interests = $interests ?: [];
+        $interests = $request->interests ?: [];
 
         $user = User::create([
             'name' => $request->name,
@@ -68,11 +64,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        if ($status === 'active') {
-            Auth::login($user);
-            return redirect(route('home', absolute: false));
-        }
-
-        return redirect(route('login'))->with('status', 'Registracija uspešna. Vaš nalog čeka odobrenje administratora.');
+        Auth::login($user);
+        return redirect(route('home', absolute: false));
     }
 }

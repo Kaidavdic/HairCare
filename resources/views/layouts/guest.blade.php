@@ -22,11 +22,8 @@
                 {{ $slot }}
             </main>
 
-            <footer class="footer footer-center p-4 bg-base-100 text-base-content border-t border-base-200">
-                <aside>
-                    <p>© {{ date('Y') }} {{ config('app.name', 'HairCare') }}</p>
-                </aside>
-            </footer>
+            <!-- Footer -->
+            <x-footer />
         </div>
     </body>
 </html>
