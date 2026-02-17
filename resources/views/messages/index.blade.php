@@ -29,7 +29,7 @@
                                     <div class="avatar @if(!$otherUser->profile_picture) placeholder @endif flex-shrink-0">
                                         @if($otherUser->profile_picture)
                                             <div class="w-14 h-14 rounded-full ring-2 ring-base-300">
-                                                <img src="{{ asset('storage/' . $otherUser->profile_picture) }}" 
+                                                <img src="{{ $otherUser->profile_picture_url }}" 
                                                      alt="{{ $otherUser->name }}" 
                                                      class="w-full h-full object-cover rounded-full" />
                                             </div>

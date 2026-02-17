@@ -22,7 +22,7 @@
             <x-input-label for="profile_picture" :value="__('Profilna slika')" />
             <div class="mt-2 flex items-center gap-4">
                 @if($user->profile_picture)
-                    <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
+                    <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
                 @else
                     <div class="avatar placeholder">
                         <div class="bg-neutral text-neutral-content rounded-full w-16">

@@ -33,7 +33,7 @@
                             <label class="label"><span class="label-text">{{ __('Pozadinska slika početne stranice') }}</span></label>
                             @if(isset($settings['hero_bg_image']))
                                 <div class="mb-2">
-                                    <img src="{{ asset('storage/' . $settings['hero_bg_image']) }}" alt="Hero Background" class="h-20 w-auto rounded border border-base-300">
+                                    <img src="{{ \Illuminate\Support\Str::startsWith($settings['hero_bg_image'], 'http') ? $settings['hero_bg_image'] : asset('storage/' . $settings['hero_bg_image']) }}" alt="Hero Background" class="h-20 w-auto rounded border border-base-300">
                                 </div>
                             @endif
                             <input type="file" name="hero_bg_image" class="file-input file-input-bordered w-full" accept="image/*" />
