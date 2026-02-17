@@ -3,7 +3,7 @@
         <div class="card w-full max-w-md bg-base-100 shadow-xl">
             <div class="card-body">
                 <div class="mb-4 text-sm text-base-content/80 text-center">
-                    {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+                    {{ __('Zaboravili ste lozinku? Nema problema. Samo nam unesite vašu email adresu i poslaćemo vam link za resetovanje lozinke koji će vam omogućiti da kreirate novu.') }}
                 </div>
 
                 <!-- Session Status -->
@@ -22,7 +22,7 @@
 
                     <div class="flex items-center justify-end mt-4">
                         <x-primary-button>
-                            {{ __('Email Password Reset Link') }}
+                            {{ __('Pošalji link za resetovanje lozinke') }}
                         </x-primary-button>
                     </div>
                 </form>
