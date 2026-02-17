@@ -12,9 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('salons', function (Blueprint $table) {
-            $table->integer('opening_hour')->default(9)->after('status');
-            $table->integer('closing_hour')->default(18)->after('opening_hour');
-            $table->json('closed_days')->nullable()->after('closing_hour');
+            if (!Schema::hasColumn('salons', 'opening_hour')) {
+                $table->integer('opening_hour')->default(9)->after('status');
+            }
+
+            if (!Schema::hasColumn('salons', 'closing_hour')) {
+                $table->integer('closing_hour')->default(18)->after('opening_hour');
+            }
+
+            if (!Schema::hasColumn('salons', 'closed_days')) {
+                $table->json('closed_days')->nullable()->after('closing_hour');
+            }
         });
     }
 
