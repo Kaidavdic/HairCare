@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('salons', function (Blueprint $table) {
             $table->integer('opening_hour')->default(9)->after('status');
             $table->integer('closing_hour')->default(18)->after('opening_hour');
-            $table->json('closed_days')->default('[]')->after('closing_hour');
+            $table->json('closed_days')->nullable()->after('closing_hour');
         });
     }
 
