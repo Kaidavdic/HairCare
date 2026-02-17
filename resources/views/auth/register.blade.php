@@ -9,8 +9,15 @@
                     {{ __('Registruj se kao klijent ili vlasnik salona i iskoristi sve mogućnosti sistema.') }}
                 </p>
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                <form method="POST" action="{{ route('register') }}" class="space-y-4" enctype="multipart/form-data">
                     @csrf
+
+                    <!-- Profile Picture -->
+                    <div>
+                        <x-input-label for="profile_picture" :value="__('Profilna slika (opciono)')" />
+                        <input id="profile_picture" name="profile_picture" type="file" class="file-input file-input-bordered file-input-primary w-full mt-1" accept="image/*" />
+                        <x-input-error :messages="$errors->get('profile_picture')" class="mt-2" />
+                    </div>
 
                     <!-- Name -->
                     <div>

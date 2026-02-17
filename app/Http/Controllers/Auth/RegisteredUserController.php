@@ -27,7 +27,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, \App\Services\ImgHippoService $imgHippoService): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -36,6 +36,7 @@ class RegisteredUserController extends Controller
             'role' => ['required', 'in:salon_owner,client'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'interests' => ['nullable', 'array'],
+            'profile_picture' => ['nullable', 'image', 'max:5120'],
         ]);
 
         $status = 'active'; // All users are active immediately
@@ -49,6 +50,11 @@ class RegisteredUserController extends Controller
         }
 
         $interests = $request->interests ?: [];
+        $profilePictureUrl = null;
+
+        if ($request->hasFile('profile_picture')) {
+            $profilePictureUrl = $imgHippoService->upload($request->file('profile_picture'));
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -60,6 +66,7 @@ class RegisteredUserController extends Controller
             'password' => $hashedPassword,
             'password_history' => [$hashedPassword],
             'interests' => $interests,
+            'profile_picture' => $profilePictureUrl,
         ]);
 
         event(new Registered($user));

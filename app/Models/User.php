@@ -14,6 +14,22 @@ class User extends Authenticatable
     public const ROLE_SALON_OWNER = 'salon_owner';
     public const ROLE_CLIENT = 'client';
 
+    protected $appends = ['profile_picture_url'];
+
+    public function getProfilePictureUrlAttribute()
+    {
+        if (!$this->profile_picture) {
+            // Return default avatar or null
+             return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+        }
+
+        if (\Illuminate\Support\Str::startsWith($this->profile_picture, 'http')) {
+            return $this->profile_picture;
+        }
+
+        return asset('storage/' . $this->profile_picture);
+    }
+
     /**
      * The attributes that are mass assignable.
      *

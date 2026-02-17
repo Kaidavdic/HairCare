@@ -11,14 +11,12 @@ class SettingsController extends Controller
 {
     public function edit()
     {
-        $settings = json_decode(Storage::get('settings.json') ?? '{}', true);
+        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
         return view('admin.settings.edit', ['settings' => $settings]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, \App\Services\ImgHippoService $imgHippoService)
     {
-        $settings = json_decode(Storage::get('settings.json') ?? '{}', true);
-
         $data = $request->validate([
             'hero_title' => ['required', 'string', 'max:255'],
             'hero_content' => ['required', 'string'],
@@ -31,19 +29,18 @@ class SettingsController extends Controller
 
         // Handle image upload
         if ($request->hasFile('hero_bg_image')) {
-            // Delete old image if it exists
-            if (isset($settings['hero_bg_image'])) {
-                Storage::disk('public')->delete($settings['hero_bg_image']);
-            }
-            
-            $path = $request->file('hero_bg_image')->store('hero', 'public');
-            $data['hero_bg_image'] = $path;
-        } else {
-            // Keep existing image if no new one uploaded
-            $data['hero_bg_image'] = $settings['hero_bg_image'] ?? null;
+             $url = $imgHippoService->upload($request->file('hero_bg_image'));
+             if ($url) {
+                 \App\Models\Setting::setValue('hero_bg_image', $url);
+             }
         }
 
-        Storage::put('settings.json', json_encode($data));
+        // Save other settings
+        foreach ($data as $key => $value) {
+            if ($key !== 'hero_bg_image') {
+                \App\Models\Setting::setValue($key, $value);
+            }
+        }
 
         return back()->with('status', 'Podešavanja sačuvana.');
     }

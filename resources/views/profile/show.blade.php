@@ -17,7 +17,7 @@
                             <div class="avatar @if(!$user->profile_picture) placeholder @endif">
                                 @if($user->profile_picture)
                                     <div class="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                        <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="{{ $user->name }}" />
+                                        <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }}" />
                                     </div>
                                 @else
                                     <div class="bg-neutral text-neutral-content rounded-full w-32">

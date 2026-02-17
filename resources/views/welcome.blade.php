@@ -16,7 +16,13 @@
 
     <!-- Hero -->
     @php
-        $heroBg = isset($settings['hero_bg_image']) ? asset('storage/' . $settings['hero_bg_image']) : null;
+        $heroBgImage = $settings['hero_bg_image'] ?? null;
+        if ($heroBgImage) {
+            $heroBg = Str::startsWith($heroBgImage, 'http') ? $heroBgImage : asset('storage/' . $heroBgImage);
+        } else {
+            $heroBg = null;
+        }
+        
         $heroTitle = $settings['hero_title'] ?? 'Ponađi savršen salon';
         $heroContent = $settings['hero_content'] ?? 'Rezerviši termin za frizuru, šminku ili masažu u najboljim salonima u gradu. Brzo, lako i pouzdano.';
     @endphp

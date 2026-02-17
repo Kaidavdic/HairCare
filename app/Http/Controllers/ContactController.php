@@ -12,7 +12,7 @@ class ContactController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $settings = json_decode(Storage::get('settings.json') ?? '{}', true);
+        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
         return view('contact', ['settings' => $settings]);
     }
 }

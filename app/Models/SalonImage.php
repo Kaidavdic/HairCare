@@ -16,6 +16,15 @@ class SalonImage extends Model
         'order',
     ];
 
+    public function getImageUrlAttribute($value)
+    {
+        if (\Illuminate\Support\Str::startsWith($value, 'http')) {
+             return $value;
+        }
+        
+        return asset($value);
+    }
+
     public function salon()
     {
         return $this->belongsTo(Salon::class);

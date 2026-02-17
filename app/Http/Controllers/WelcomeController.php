@@ -78,7 +78,7 @@ class WelcomeController extends Controller
 
         $salons = $query->paginate(9)->withQueryString();
 
-        $settings = json_decode(\Illuminate\Support\Facades\Storage::get('settings.json') ?? '{}', true);
+        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
 
         return view('welcome', [
             'news' => $news,

@@ -51,7 +51,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request, \App\Services\ImgHippoService $imgHippoService): RedirectResponse
     {
         $data = $request->validated();
         
@@ -62,14 +62,10 @@ class ProfileController extends Controller
 
         // Handle profile picture upload
         if ($request->hasFile('profile_picture')) {
-            // Delete old profile picture if exists
-            if ($request->user()->profile_picture) {
-                \Storage::disk('public')->delete($request->user()->profile_picture);
+            $path = $imgHippoService->upload($request->file('profile_picture'));
+            if ($path) {
+                $data['profile_picture'] = $path;
             }
-
-            // Store new profile picture
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $data['profile_picture'] = $path;
         }
 
         $request->user()->fill($data);

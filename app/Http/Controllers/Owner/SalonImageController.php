@@ -13,7 +13,7 @@ class SalonImageController extends Controller
     /**
      * Store a newly uploaded image.
      */
-    public function store(Request $request)
+    public function store(Request $request, \App\Services\ImgHippoService $imgHippoService)
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
@@ -31,14 +31,17 @@ class SalonImageController extends Controller
             return redirect()->route('owner.salon.edit')->with('error', 'Ne možete dodavati slike dok salon nije odobren.');
         }
 
-        $file = $request->file('image');
-        $path = $file->store('salons/' . $salon->id, 'public');
+        $url = $imgHippoService->upload($request->file('image'));
+        
+        if (!$url) {
+             return redirect()->route('owner.salon.edit')->with('error', 'Greška prilikom slanja slike.');
+        }
 
         $order = $salon->images()->max('order') ?? 0;
 
         SalonImage::create([
             'salon_id' => $salon->id,
-            'image_url' => '/storage/' . $path,
+            'image_url' => $url,
             'alt_text' => $request->input('alt_text', ''),
             'order' => $order + 1,
         ]);
@@ -58,10 +61,7 @@ class SalonImageController extends Controller
         }
 
         // Delete file from storage
-        if ($image->image_url) {
-            $path = str_replace('/storage/', '', $image->image_url);
-            Storage::disk('public')->delete($path);
-        }
+        // Note: We cannot easily delete from ImgHippo via this API, so we just delete the record.
 
         $image->delete();
 
